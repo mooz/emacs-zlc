@@ -146,7 +146,9 @@ select completion orderly."
                (minibuffer-message "Sole completion")
                t)
         (#b011 (goto-char (field-end))
-               (minibuffer-message "Complete, but not unique")
+               ;; immediately display completions
+               (if completion-auto-help
+                   (minibuffer-completion-help))
                t)
         (t     t)))))
 
