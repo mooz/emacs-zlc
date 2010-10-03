@@ -1,4 +1,4 @@
-;;; zlc.el --- provides zsh like completion in the minibuffer
+;;; zlc.el --- Provides zsh like completion for minibuffer
 
 ;; Copyright (C) 2010  mooz
 
