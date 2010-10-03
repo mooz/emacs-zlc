@@ -1,7 +1,7 @@
 zlc
 ===
 
-Provides zsh like completion to minibuffer of Emacs.
+Provides zsh like completion for minibuffer in Emacs.
 
 Install
 =======
