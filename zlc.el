@@ -28,8 +28,17 @@
 ;;; Code:
 
 (defvar zlc--global-cache nil)
-(defvar zlc--index 0)
+(defvar zlc--index -1)
 (defvar zlc--field-begin 0)
+(defvar zlc--previous-overlay nil)
+
+(defface zlc-selected-completion-face
+  '((t
+     (:foreground "white"
+      :background "firebrick"
+      :italic nil
+      :bold t)))
+  "Style of selected item in *Completions* buffer")
 
 ;; Save completions
 (defadvice display-completion-list (after zlc--save-global-cache activate)
@@ -39,9 +48,40 @@
 ;; Private
 ;; ============================================================ ;;
 
-(defun zlc--reset ()
+(defsubst zlc--current-candidate ()
+  (nth zlc--index zlc--global-cache))
+
+(defsubst zlc--reset ()
   (setq zlc--field-begin (field-end)
-        zlc--index 0))
+        zlc--index -1))
+
+(defsubst zlc--clear-overlay ()
+  (when zlc--previous-overlay
+    (delete-overlay zlc--previous-overlay)))
+
+(defun zlc--highlight-nth-completion (n)
+  (with-current-buffer "*Completions*"
+    (let ((begin (point-min))
+          (end (point-min)))
+      (dotimes (_ (1+ n))
+        (setq begin
+              (or (next-single-property-change end 'mouse-face) (point-min)))
+        (setq end
+              (or (next-single-property-change begin 'mouse-face) (point-max))))
+      ;; clear previous highlight
+      (zlc--clear-overlay)
+      ;; create overlay and set face
+      (overlay-put
+       (setq zlc--previous-overlay
+             (make-overlay begin end))
+       'face 'zlc-selected-completion-face)
+      ;; ensure highlight is in view (TODO: Wrong type argument: window-live-p)
+      ;; (zlc--ensure-visible (current-buffer) begin)
+      )))
+
+(defsubst zlc--ensure-visible (win p)
+  (unless (pos-visible-in-window-p p win)
+    (set-window-start win p)))
 
 ;; ============================================================ ;;
 ;; Public
@@ -51,23 +91,30 @@
   (interactive)
   ;; clear previous completion
   (delete-region zlc--field-begin (field-end))
-  (when (>= zlc--index 0)
-    ;; select next completion
-    (let* ((str (nth zlc--index zlc--global-cache))
-           ;; sometimes (get-text-property 0 'face str) does not work...
-           (from (if (eq (cadr (text-properties-at 0 str))
-                         'completions-first-difference)
-                     0
-                   (or (next-property-change 0 str) 0))))
-      (insert (substring str from))))
+  ;; set next index
   (incf zlc--index (or direction 1))
   (setq zlc--index
         (cond
          ((>= zlc--index (length zlc--global-cache))
           -1)
          ((< zlc--index 0)
-          (1- (length zlc--global-cache)))
-         (t zlc--index))))
+          (if (= zlc--index -1)
+              -1                        ; select original string
+            (1- (length zlc--global-cache))))
+         (t zlc--index)))
+  ;; select
+  (if (>= zlc--index 0)
+      ;; select next completion
+      (let* ((str (zlc--current-candidate))
+             ;; sometimes (get-text-property 0 'face str) does not work...
+             (from (if (eq (cadr (text-properties-at 0 str))
+                           'completions-first-difference)
+                       0
+                     (or (next-property-change 0 str) 0))))
+        (insert (substring str from))
+        (zlc--highlight-nth-completion zlc--index))
+    ;; otherwise
+    (zlc--clear-overlay)))
 
 (defun zlc-select-previous ()
   (interactive)
@@ -82,7 +129,7 @@
 Return nil if there is no valid completion, else t.
 If no characters can be completed, display a list of possible completions.
 If you repeat this command after it displayed such a list,
-scroll the window of possible completions."
+select completion orderly."
   (interactive)
   ;; reset when ...
   (unless (or (eq last-command this-command)
@@ -91,7 +138,7 @@ scroll the window of possible completions."
   (let ((window minibuffer-scroll-window))
     ;; If there's completions, select one of them orderly.
     (if (window-live-p window)
-        (zlc-select-next 1)
+        (or (zlc-select-next 1) t)
       ;; otherwise, reset completions and arrange new one
       (zlc--reset)
       (case (completion--do-completion)
