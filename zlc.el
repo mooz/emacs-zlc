@@ -40,6 +40,11 @@
       :bold t)))
   "Style of selected item in *Completions* buffer")
 
+(defcustom zlc-select-completion-immediately nil
+  "Non-nil to select completion immediately when completion list created."
+  :type 'boolean
+  :group 'zlc)
+
 ;; Save completions
 (defadvice display-completion-list (after zlc--save-global-cache activate)
   (setq zlc--global-cache (ad-get-arg 0)))
@@ -85,6 +90,11 @@
 ;; ============================================================ ;;
 ;; Public
 ;; ============================================================ ;;
+
+(defun zlc-reset ()
+  (interactive)
+  (delete-region zlc--field-begin (field-end))
+  (zlc--reset))
 
 (defun zlc-select-next (&optional direction)
   (interactive)
@@ -147,8 +157,10 @@ select completion orderly."
                t)
         (#b011 (goto-char (field-end))
                ;; immediately display completions
-               (if completion-auto-help
-                   (minibuffer-completion-help))
+               (minibuffer-completion-help)
+               ;; select first completion if needed
+               (when zlc-select-completion-immediately
+                 (zlc-select-next 1))
                t)
         (t     t)))))
 
@@ -157,7 +169,9 @@ select completion orderly."
 ;; ============================================================ ;;
 
 (let ((map minibuffer-local-map))
-  (define-key map (kbd "<backtab>") 'zlc-select-previous))
+  (define-key map (kbd "<backtab>") 'zlc-select-previous)
+  ;; (define-key map (kbd "C-c") 'zlc-reset)
+  )
 
 (provide 'zlc)
 ;;; zlc.el ends here
