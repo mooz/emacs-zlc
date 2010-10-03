@@ -59,6 +59,10 @@
   (when zlc--previous-overlay
     (delete-overlay zlc--previous-overlay)))
 
+(defsubst zlc--ensure-visible (win p)
+  (unless (pos-visible-in-window-p p win)
+    (set-window-start win p)))
+
 (defun zlc--highlight-nth-completion (n)
   (with-current-buffer "*Completions*"
     (let ((begin (point-min))
@@ -76,12 +80,8 @@
              (make-overlay begin end))
        'face 'zlc-selected-completion-face)
       ;; ensure highlight is in view (TODO: Wrong type argument: window-live-p)
-      ;; (zlc--ensure-visible (current-buffer) begin)
+      ; (zlc--ensure-visible (current-buffer) begin)
       )))
-
-(defsubst zlc--ensure-visible (win p)
-  (unless (pos-visible-in-window-p p win)
-    (set-window-start win p)))
 
 ;; ============================================================ ;;
 ;; Public
