@@ -79,9 +79,8 @@
        (setq zlc--previous-overlay
              (make-overlay begin end))
        'face 'zlc-selected-completion-face)
-      ;; ensure highlight is in view (TODO: Wrong type argument: window-live-p)
-      ; (zlc--ensure-visible (current-buffer) begin)
-      )))
+      ;; ensure highlight is in view
+      (zlc--ensure-visible (get-buffer-window) begin))))
 
 ;; ============================================================ ;;
 ;; Public
