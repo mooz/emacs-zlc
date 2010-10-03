@@ -170,6 +170,7 @@ select completion orderly."
 
 (let ((map minibuffer-local-map))
   (define-key map (kbd "<backtab>") 'zlc-select-previous)
+  (define-key map (kbd "S-<tab>") 'zlc-select-previous)
   ;; (define-key map (kbd "C-c") 'zlc-reset)
   )
 
