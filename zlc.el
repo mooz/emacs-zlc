@@ -43,6 +43,8 @@
 
 ;;; Code:
 
+(eval-when-compile (require 'cl))
+
 (defvar zlc--global-cache nil)
 (defvar zlc--index -1)
 (defvar zlc--field-begin 0)
