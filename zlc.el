@@ -195,6 +195,8 @@ select completion orderly."
   ;; reset when ...
   (unless (or (eq last-command this-command)
               (eq last-command 'zlc-reset)
+              (eq last-command 'zlc-select-previous)
+              (eq last-command 'zlc-select-previous-vertical)
               (eq last-command 'zlc-select-next)
               (eq last-command 'zlc-select-next-vertical))
     (setq minibuffer-scroll-window nil))
