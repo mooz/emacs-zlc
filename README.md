@@ -38,7 +38,7 @@ complete immediately
 --------------------
 
 If you want zlc to select completion immediately when *Completions* buffer is created,
-set non-Nil value to the @zlc-select-completion-immediately@.
+set non-Nil value to the `zlc-select-completion-immediately`.
 
     (setq zlc-select-completion-immediately t)
 
@@ -47,4 +47,4 @@ selected item's style
 
 You can customize the style of the selected item in the *Completions* buffer.
 
-To change style, @M-x customize-face@ and input @zlc-selected-completion-face@.
+To change style, `M-x customize-face` and input `zlc-selected-completion-face`.
