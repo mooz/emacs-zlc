@@ -216,11 +216,12 @@ select completion orderly."
         (#b001 (goto-char (field-end))
                (minibuffer-message "Sole completion")
                t)
-        ((#b011 #b111)
+        ((#b011 #b110 #b111)
          (goto-char (field-end))
          ;; immediately display completions
          (minibuffer-completion-help)
-         (when (eq #b111 completion-status)
+         (when (or (eq #b110 completion-status)
+                   (eq #b111 completion-status))
            (setq zlc--field-begin (field-end)))
          ;; select first completion if needed
          (when zlc-select-completion-immediately
