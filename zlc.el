@@ -94,6 +94,7 @@
 (defun zlc-reset ()
   (interactive)
   (delete-region zlc--field-begin (field-end))
+  (zlc--clear-overlay)
   (zlc--reset))
 
 (defun zlc-select-next (&optional direction)
@@ -142,6 +143,8 @@ select completion orderly."
   (interactive)
   ;; reset when ...
   (unless (or (eq last-command this-command)
+              (eq last-command 'zlc-reset)
+              (eq last-command 'zlc-select-next)
               (eq last-command 'zlc-select-previous))
     (setq minibuffer-scroll-window nil))
   (let ((window minibuffer-scroll-window))
