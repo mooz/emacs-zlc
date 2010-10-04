@@ -226,7 +226,7 @@ select completion orderly."
          (when zlc-select-completion-immediately
            (zlc-select-next 1))
          t)
-        (t     t)))))
+        (t t)))))
 
 ;; ============================================================ ;;
 ;; Settings
