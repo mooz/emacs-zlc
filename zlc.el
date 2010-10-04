@@ -25,6 +25,22 @@
 ;; In your emacs config,
 ;; (require 'zlc)
 
+;;; Customization:
+
+;; To simulate zsh's `menu select', zlc arranges movement commands for 4 directions.
+;; If you want to use these commands, bind them to certain keys in your emacs config.
+;;
+;; (let ((map minibuffer-local-map))
+;;   ;;; like menu select
+;;   (define-key map (kbd "<down>")  'zlc-select-next-vertical)
+;;   (define-key map (kbd "<up>")    'zlc-select-previous-vertical)
+;;   (define-key map (kbd "<right>") 'zlc-select-next)
+;;   (define-key map (kbd "<left>")  'zlc-select-previous)
+;;
+;;   ;;; reset selection
+;;   (define-key map (kbd "C-c") 'zlc-reset)
+;;   )
+
 ;;; Code:
 
 (defvar zlc--global-cache nil)
@@ -53,6 +69,33 @@
 ;; Private
 ;; ============================================================ ;;
 
+(defsubst zlc--eol-position ()
+  (save-excursion
+    (end-of-line)
+    (point)))
+
+(defsubst zlc--current-columns ()
+  (with-current-buffer "*Completions*"
+    (save-excursion
+      (goto-char (next-single-property-change (point-min) 'mouse-face))
+      (let ((edges 0)
+            (from (point))
+            (limit (zlc--eol-position)))
+        (while (/= (setq from (next-single-property-change from 'mouse-face nil limit))
+                   limit)
+          (incf edges))
+        (/ (+ edges 2) 2)))))
+
+(defsubst zlc--normalize-index (idx limit)
+  (cond
+   ((>= idx limit)
+    -1)
+   ((< idx 0)
+    (if (= idx -1)
+        -1                        ; select original string
+      (1- limit)))
+   (t idx)))
+
 (defsubst zlc--current-candidate ()
   (nth zlc--index zlc--global-cache))
 
@@ -68,7 +111,7 @@
   (unless (pos-visible-in-window-p p win)
     (set-window-start win p)))
 
-(defun zlc--highlight-nth-completion (n)
+(defsubst zlc--highlight-nth-completion (n)
   (with-current-buffer "*Completions*"
     (let ((begin (point-min))
           (end (point-min)))
@@ -87,31 +130,9 @@
       ;; ensure highlight is in view
       (zlc--ensure-visible (get-buffer-window) begin))))
 
-;; ============================================================ ;;
-;; Public
-;; ============================================================ ;;
-
-(defun zlc-reset ()
-  (interactive)
-  (delete-region zlc--field-begin (field-end))
-  (zlc--clear-overlay)
-  (zlc--reset))
-
-(defun zlc-select-next (&optional direction)
-  (interactive)
+(defsubst zlc--do-select ()
   ;; clear previous completion
   (delete-region zlc--field-begin (field-end))
-  ;; set next index
-  (incf zlc--index (or direction 1))
-  (setq zlc--index
-        (cond
-         ((>= zlc--index (length zlc--global-cache))
-          -1)
-         ((< zlc--index 0)
-          (if (= zlc--index -1)
-              -1                        ; select original string
-            (1- (length zlc--global-cache))))
-         (t zlc--index)))
   ;; select
   (if (>= zlc--index 0)
       ;; select next completion
@@ -126,9 +147,39 @@
     ;; otherwise
     (zlc--clear-overlay)))
 
+;; ============================================================ ;;
+;; Public
+;; ============================================================ ;;
+
+(defun zlc-reset ()
+  (interactive)
+  (delete-region zlc--field-begin (field-end))
+  (zlc--clear-overlay)
+  (zlc--reset))
+
+(defun zlc-select-nth (n)
+  (interactive)
+  (setq zlc--index (zlc--normalize-index
+                    n
+                    (length zlc--global-cache)))
+  (zlc--do-select))
+
+(defun zlc-select-next (&optional direction)
+  (interactive)
+  (zlc-select-nth (+ zlc--index (or direction 1))))
+
 (defun zlc-select-previous ()
   (interactive)
   (zlc-select-next -1))
+
+(defun zlc-select-next-vertical (&optional direction)
+  (interactive)
+  (zlc-select-nth (+ zlc--index (* (zlc--current-columns)
+                                   (or direction 1)))))
+
+(defun zlc-select-previous-vertical ()
+  (interactive)
+  (zlc-select-next-vertical -1))
 
 ;; ============================================================ ;;
 ;; Overrides
@@ -145,7 +196,7 @@ select completion orderly."
   (unless (or (eq last-command this-command)
               (eq last-command 'zlc-reset)
               (eq last-command 'zlc-select-next)
-              (eq last-command 'zlc-select-previous))
+              (eq last-command 'zlc-select-next-vertical))
     (setq minibuffer-scroll-window nil))
   (let ((window minibuffer-scroll-window))
     ;; If there's completions, select one of them orderly.
@@ -173,9 +224,7 @@ select completion orderly."
 
 (let ((map minibuffer-local-map))
   (define-key map (kbd "<backtab>") 'zlc-select-previous)
-  (define-key map (kbd "S-<tab>") 'zlc-select-previous)
-  ;; (define-key map (kbd "C-c") 'zlc-reset)
-  )
+  (define-key map (kbd "S-<tab>") 'zlc-select-previous))
 
 (provide 'zlc)
 ;;; zlc.el ends here
