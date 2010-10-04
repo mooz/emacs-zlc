@@ -203,30 +203,29 @@ select completion orderly."
               (eq last-command 'zlc-select-next)
               (eq last-command 'zlc-select-next-vertical))
     (setq minibuffer-scroll-window nil))
-  (let ((window minibuffer-scroll-window))
+  (let ((window minibuffer-scroll-window)
+        completino-status)
     ;; If there's completions, select one of them orderly.
     (if (window-live-p window)
         (or (zlc-select-next 1) t)
       ;; otherwise, reset completions and arrange new one
       (zlc--reset)
-      (case (completion--do-completion)
+      (case (setq completion-status
+                  (completion--do-completion))
         (#b000 nil)
         (#b001 (goto-char (field-end))
                (minibuffer-message "Sole completion")
                t)
-        (#b011 (goto-char (field-end))
-               ;; immediately display completions
-               (minibuffer-completion-help)
-               ;; select first completion if needed
-               (when zlc-select-completion-immediately
-                 (zlc-select-next 1))
-               t)
-        (#b111 (goto-char (field-end))
-               ;; got sole completion, but there are more completions
-               (minibuffer-completion-help)
-               ;; we need to fix field-beginning
-               (setq zlc--field-begin (field-end))
-               t)
+        ((#b011 #b111)
+         (goto-char (field-end))
+         ;; immediately display completions
+         (minibuffer-completion-help)
+         (when (eq #b111 completion-status)
+           (setq zlc--field-begin (field-end)))
+         ;; select first completion if needed
+         (when zlc-select-completion-immediately
+           (zlc-select-next 1))
+         t)
         (t     t)))))
 
 ;; ============================================================ ;;
