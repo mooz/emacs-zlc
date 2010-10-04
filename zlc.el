@@ -140,10 +140,11 @@
       ;; select next completion
       (let* ((str (zlc--current-candidate))
              ;; sometimes (get-text-property 0 'face str) does not work...
-             (from (if (eq (cadr (text-properties-at 0 str))
-                           'completions-first-difference)
-                       0
-                     (or (next-property-change 0 str) 0))))
+             (from (case (cadr (text-properties-at 0 str))
+                     ('completions-common-part
+                      (or (next-property-change 0 str)
+                          (length str)))
+                     (t 0))))
         (insert (substring str from))
         (zlc--highlight-nth-completion zlc--index))
     ;; otherwise
@@ -219,6 +220,12 @@ select completion orderly."
                ;; select first completion if needed
                (when zlc-select-completion-immediately
                  (zlc-select-next 1))
+               t)
+        (#b111 (goto-char (field-end))
+               ;; got sole completion, but there are more completions
+               (minibuffer-completion-help)
+               ;; we need to fix field-beginning
+               (setq zlc--field-begin (field-end))
                t)
         (t     t)))))
 
