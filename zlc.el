@@ -45,6 +45,7 @@
 
 (eval-when-compile (require 'cl))
 
+(defvar zlc--mode nil)
 (defvar zlc--global-cache nil)
 (defvar zlc--index -1)
 (defvar zlc--field-begin 0)
@@ -64,8 +65,13 @@
   :group 'zlc)
 
 ;; Save completions
-(defadvice display-completion-list (after zlc--save-global-cache activate)
+(defadvice display-completion-list (after zlc--save-global-cache)
   (setq zlc--global-cache (ad-get-arg 0)))
+
+(defadvice minibuffer-complete (around zlc--around-minibuffer-complete)
+  (if zlc--mode
+      (zlc-minibuffer-complete)
+    ad-do-it))
 
 ;; ============================================================ ;;
 ;; Private
@@ -184,11 +190,7 @@
   (interactive)
   (zlc-select-next-vertical -1))
 
-;; ============================================================ ;;
-;; Overrides
-;; ============================================================ ;;
-
-(defun minibuffer-complete ()
+(defun zlc-minibuffer-complete ()
   "Complete the minibuffer contents as far as possible.
 Return nil if there is no valid completion, else t.
 If no characters can be completed, display a list of possible completions.
@@ -229,6 +231,25 @@ select completion orderly."
          t)
         (t t)))))
 
+(defun zlc-mode (&optional arg)
+  "Toggle zlc (zsh like completion) on or off.
+With ARG, turn zlc on if arg is positive, off otherwise."
+  (interactive "P")
+  (setq zlc--mode
+	(cond
+	 ((null arg) (not zlc--mode))
+	 ((eq arg t) t)
+	 ((> (prefix-numeric-value arg) 0) t)
+	 (t nil)))
+  ;; advice
+  (let ((manip (if zlc--mode 'ad-enable-advice 'ad-disable-advice)))
+    (funcall manip 'display-completion-list 'after 'zlc--save-global-cache)
+    (funcall manip 'minibuffer-complete 'around 'zlc--around-minibuffer-complete))
+  (ad-activate 'display-completion-list)
+  (ad-activate 'minibuffer-complete)
+  ;; ok
+  (message "zlc mode %s" (if zlc--mode "enabled" "disabled")))
+
 ;; ============================================================ ;;
 ;; Settings
 ;; ============================================================ ;;
@@ -236,6 +257,9 @@ select completion orderly."
 (let ((map minibuffer-local-map))
   (define-key map (kbd "<backtab>") 'zlc-select-previous)
   (define-key map (kbd "S-<tab>") 'zlc-select-previous))
+
+;; keep compatibility...
+(zlc-mode t)
 
 (provide 'zlc)
 ;;; zlc.el ends here
