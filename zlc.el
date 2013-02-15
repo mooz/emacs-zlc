@@ -144,7 +144,8 @@
   ;; select
   (if (>= zlc--index 0)
       ;; select next completion
-      (let* ((str (zlc--current-candidate))
+      (let* ((cand (zlc--current-candidate))
+             (str (if (consp cand) (car cand) cand))
              ;; sometimes (get-text-property 0 'face str) does not work...
              (from (case (cadr (text-properties-at 0 str))
                      ('completions-common-part
