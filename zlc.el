@@ -247,11 +247,11 @@ select completion orderly."
 With ARG, turn zlc on if arg is positive, off otherwise."
   (interactive "P")
   (setq zlc--mode
-	(cond
-	 ((null arg) (not zlc--mode))
-	 ((eq arg t) t)
-	 ((> (prefix-numeric-value arg) 0) t)
-	 (t nil)))
+        (cond
+         ((null arg) (not zlc--mode))
+         ((eq arg t) t)
+         ((> (prefix-numeric-value arg) 0) t)
+         (t nil)))
   ;; advice
   (let ((manip (if zlc--mode 'ad-enable-advice 'ad-disable-advice)))
     (funcall manip 'display-completion-list 'after 'zlc--save-global-cache)
