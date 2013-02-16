@@ -1,6 +1,6 @@
-;;; zlc.el --- Provides zsh like completion for minibuffer
+;;; zlc.el --- Provides zsh like completion system to Emacs
 
-;; Copyright (C) 2010  mooz
+;; Copyright (C) 2010, 2013 mooz
 
 ;; Author:  mooz <stillpedant@gmail.com>
 ;; Keywords: matching, convenience
@@ -20,15 +20,25 @@
 
 ;;; Commentary:
 
-;;; Usage:
-
-;; In your emacs config,
+;; 'zlc.el' provides zsh like completion system to Emacs. That is, zlc
+;; allows you to select candidates one-by-one by pressing `TAB'
+;; repeatedly in minibuffer, shell-mode, and so forth. In addition,
+;; with arrow keys, you can move around the candidates.
+;;
+;; To enable zlc, just put the following line in your Emacs config.
+;;
 ;; (require 'zlc)
+;;
+;; To disable zlc, call `zlc-mode' with `nil', as follows.
+;;
+;; (zlc-mode nil)
 
 ;;; Customization:
 
-;; To simulate zsh's `menu select', zlc arranges movement commands for 4 directions.
-;; If you want to use these commands, bind them to certain keys in your emacs config.
+;; To simulate zsh's `menu select', which allows you to move around
+;; candidates, zlc arranges movement commands for 4 directions. If you
+;; want to use these commands, bind them to certain keys in your Emacs
+;; config.
 ;;
 ;; (let ((map minibuffer-local-map))
 ;;   ;;; like menu select
