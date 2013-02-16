@@ -1,18 +1,23 @@
-zlc
-===
+zlc.el
+======
 
-Provides zsh like completion for minibuffer in Emacs.
+Zsh like completion system for Emacs.
 
 ![screenshot of zlc](http://github.com/mooz/emacs-zlc/raw/master/images/screenshot.png"Selecting items in the *Completion* buffer")
 
-Install
-=======
+Installation
+============
 
-Place zlc.el into your site-lisp directory.
+From package.el with MELPA repository,
 
-In you emacs config:
+    M-x package-install zlc
+
+Or you can just put zlc.el in your load path somewhere.
+
+Then, put the following lines into you emacs config.
 
     (require 'zlc)
+    (zlc-mode t)
 
 Customization
 =============
