@@ -25,13 +25,10 @@
 ;; repeatedly in minibuffer, shell-mode, and so forth. In addition,
 ;; with arrow keys, you can move around the candidates.
 ;;
-;; To enable zlc, just put the following line in your Emacs config.
+;; To enable zlc, just put the following lines in your Emacs config.
 ;;
 ;; (require 'zlc)
-;;
-;; To disable zlc, call `zlc-mode' with `nil', as follows.
-;;
-;; (zlc-mode nil)
+;; (zlc-mode t)
 
 ;;; Customization:
 
@@ -247,6 +244,7 @@ select completion orderly."
          t)
         (t t)))))
 
+;;;###autoload
 (defun zlc-mode (&optional arg)
   "Toggle zlc (zsh like completion) on or off.
 With ARG, turn zlc on if arg is positive, off otherwise."
@@ -273,9 +271,6 @@ With ARG, turn zlc on if arg is positive, off otherwise."
 (let ((map minibuffer-local-map))
   (define-key map (kbd "<backtab>") 'zlc-select-previous)
   (define-key map (kbd "S-<tab>") 'zlc-select-previous))
-
-;; keep compatibility...
-(zlc-mode t)
 
 (provide 'zlc)
 ;;; zlc.el ends here
