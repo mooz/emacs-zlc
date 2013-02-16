@@ -224,7 +224,12 @@ select completion orderly."
       ;; otherwise, reset completions and arrange new one
       (zlc--reset)
       (case (setq completion-status
-                  (completion--do-completion))
+                  ;; Suppress `minibuffer-message' in the completion
+                  ;; process by setting nil to
+                  ;; `completion-show-inline-help', since
+                  ;; `minibuffer-message' is a blocking fucntion
+                  (let (completion-show-inline-help)
+                    (completion--do-completion)))
         (#b000 nil)
         (#b001 (goto-char (field-end))
                (minibuffer-message "Sole completion")
