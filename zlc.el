@@ -217,7 +217,7 @@ select completion orderly."
               (eq last-command 'zlc-select-next-vertical))
     (setq minibuffer-scroll-window nil))
   (let ((window minibuffer-scroll-window)
-        completino-status)
+        completion-status)
     ;; If there's completions, select one of them orderly.
     (if (window-live-p window)
         (or (zlc-select-next 1) t)
