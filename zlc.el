@@ -65,9 +65,9 @@
       :background "firebrick"
       :italic nil
       :bold t)))
-  nil
+  "Style of selected item in *Completions* buffer"
   :group 'zlc-face
-  "Style of selected item in *Completions* buffer")
+  )
 
 (defcustom zlc-select-completion-immediately nil
   "Non-nil to select completion immediately when completion list created."
