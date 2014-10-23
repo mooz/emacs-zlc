@@ -229,7 +229,7 @@ select completion orderly."
                   ;; `completion-show-inline-help', since
                   ;; `minibuffer-message' is a blocking fucntion
                   (let (completion-show-inline-help)
-                    (completion--do-completion)))
+                    (completion--do-completion (minibuffer-prompt-end) (point-max))))
         (#b000 nil)
         (#b001 (goto-char (field-end))
                (minibuffer-message "Sole completion")
