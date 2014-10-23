@@ -201,6 +201,11 @@
   (interactive)
   (zlc-select-next-vertical -1))
 
+(defsubst zlc--do-completion ()
+  (if (version<= "24.4" emacs-version)
+      (completion--do-completion (minibuffer-prompt-end) (point-max))
+    (completion--do-completion)))
+
 (defun zlc-minibuffer-complete ()
   "Complete the minibuffer contents as far as possible.
 Return nil if there is no valid completion, else t.
@@ -229,7 +234,7 @@ select completion orderly."
                   ;; `completion-show-inline-help', since
                   ;; `minibuffer-message' is a blocking fucntion
                   (let (completion-show-inline-help)
-                    (completion--do-completion (minibuffer-prompt-end) (point-max))))
+                    (zlc--do-completion)))
         (#b000 nil)
         (#b001 (goto-char (field-end))
                (minibuffer-message "Sole completion")
