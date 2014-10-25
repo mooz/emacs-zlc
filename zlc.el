@@ -3,7 +3,7 @@
 ;; Copyright (C) 2010, 2013 mooz
 
 ;; Author:  mooz <stillpedant@gmail.com>
-;; Version: 0.0.3
+;; Version: 0.0.4
 ;; Keywords: matching, convenience
 
 ;; This program is free software; you can redistribute it and/or modify
@@ -201,10 +201,10 @@
   (interactive)
   (zlc-select-next-vertical -1))
 
-(defsubst zlc--do-completion ()
-  (if (version<= "24.4" emacs-version)
-      (completion--do-completion (minibuffer-prompt-end) (point-max))
-    (completion--do-completion)))
+(defmacro zlc--do-completion ()
+  (if (eq (car (help-function-arglist 'completion--do-completion)) '&optional)
+      (completion--do-completion)
+    '(completion--do-completion (minibuffer-prompt-end) (point-max))))
 
 (defun zlc-minibuffer-complete ()
   "Complete the minibuffer contents as far as possible.
