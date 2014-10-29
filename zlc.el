@@ -3,7 +3,7 @@
 ;; Copyright (C) 2010, 2013 mooz
 
 ;; Author:  mooz <stillpedant@gmail.com>
-;; Version: 0.0.4
+;; Version: 0.0.5
 ;; Keywords: matching, convenience
 
 ;; This program is free software; you can redistribute it and/or modify
@@ -203,7 +203,7 @@
 
 (defmacro zlc--do-completion ()
   (if (eq (car (help-function-arglist 'completion--do-completion)) '&optional)
-      (completion--do-completion)
+      '(completion--do-completion)
     '(completion--do-completion (minibuffer-prompt-end) (point-max))))
 
 (defun zlc-minibuffer-complete ()
