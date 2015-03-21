@@ -235,7 +235,8 @@ select completion orderly."
                   ;; `minibuffer-message' is a blocking fucntion
                   (let (completion-show-inline-help)
                     (zlc--do-completion)))
-        (#b000 nil)
+        (#b000 (goto-char (field-end))
+               (minibuffer-message "No candidates found"))
         (#b001 (goto-char (field-end))
                (minibuffer-message "Sole completion")
                t)
