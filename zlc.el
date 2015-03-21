@@ -201,6 +201,14 @@
   (interactive)
   (zlc-select-next-vertical -1))
 
+(defun zlc-enter-directory-by-slash ()
+  (interactive)
+  (if (and (equal (string (char-before)) "/")
+           (eq (point) (field-end)))
+      (zlc-minibuffer-complete)
+    (progn (insert "/")
+           (setq minibuffer-scroll-window nil))))
+
 (defmacro zlc--do-completion ()
   (if (eq (car (help-function-arglist 'completion--do-completion)) '&optional)
       '(completion--do-completion)
@@ -219,7 +227,8 @@ select completion orderly."
               (eq last-command 'zlc-select-previous)
               (eq last-command 'zlc-select-previous-vertical)
               (eq last-command 'zlc-select-next)
-              (eq last-command 'zlc-select-next-vertical))
+              (eq last-command 'zlc-select-next-vertical)
+              (eq last-command 'zlc-enter-directory-by-slash))
     (setq minibuffer-scroll-window nil))
   (let ((window minibuffer-scroll-window)
         completion-status)
@@ -278,7 +287,8 @@ With ARG, turn zlc on if arg is positive, off otherwise."
 
 (let ((map minibuffer-local-map))
   (define-key map (kbd "<backtab>") 'zlc-select-previous)
-  (define-key map (kbd "S-<tab>") 'zlc-select-previous))
+  (define-key map (kbd "S-<tab>") 'zlc-select-previous)
+  (define-key map (kbd "/") 'zlc-enter-directory-by-slash))
 
 (provide 'zlc)
 ;;; zlc.el ends here
