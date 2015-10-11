@@ -209,10 +209,10 @@
     (progn (insert "/")
            (setq minibuffer-scroll-window nil))))
 
-(defmacro zlc--do-completion ()
+(defsubst zlc--do-completion ()
   (if (eq (car (help-function-arglist 'completion--do-completion)) '&optional)
-      '(completion--do-completion)
-    '(completion--do-completion (minibuffer-prompt-end) (point-max))))
+      (completion--do-completion)
+    (completion--do-completion (minibuffer-prompt-end) (point-max))))
 
 (defun zlc-minibuffer-complete ()
   "Complete the minibuffer contents as far as possible.
