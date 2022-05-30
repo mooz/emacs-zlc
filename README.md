@@ -3,7 +3,7 @@ zlc.el
 
 Zsh like completion system for Emacs.
 
-![screenshot of zlc](http://github.com/mooz/emacs-zlc/raw/master/images/screenshot.png"Selecting items in the *Completion* buffer")
+![Screenshot of zlc selecting items in the *Completion* buffer](/images/screenshot.png)
 
 Installation
 ============
